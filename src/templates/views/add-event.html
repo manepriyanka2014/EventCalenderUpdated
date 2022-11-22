@@ -1,0 +1,37 @@
+<div class="cart-card">
+    <div class="info">
+        <span class="title2">Add Event Information</span>
+        <hr />
+
+<!--        <label for="birthday">Date:</label>-->
+<!--        <input type="date" id="birthday" name="birthday"><br>-->
+
+        <div class="input-row">
+            <label class="label1">Date</label>
+            <input class="cart-input" ng-model="ctrl.eventDetails.date" type="text"
+                   placeholder="yyyy-mm-dd" required>
+        </div>
+
+        <div class="input-row">
+            <label class="label1"> Title</label>
+            <input class="cart-input" ng-model="ctrl.eventDetails.title" type="text"
+                   placeholder="Enter your Title" required>
+        </div>
+
+        <div class="input-row">
+            <label class="label1"> Link</label>
+            <input class="cart-input" ng-model="ctrl.eventDetails.link" type="text"
+                   placeholder="Enter the Link" required>
+        </div>
+
+        <button class="continue" ng-click="ctrl.addEvent()"> Add </button>
+        <button class="continue" ng-click="ctrl.reDirectToDashboard()"> Back </button>
+        <div class="message2" ng-show="ctrl.successUserAddedMessagebool">
+            <strong>{{ ctrl.successUserAddedMessage }}</strong>
+        </div>
+        <div class="message2" ng-show="ctrl.failedUserAddedMessagebool">
+            <strong>{{ ctrl.failedUserAddedMessage }}</strong>
+        </div>
+    </div>
+
+</div>
