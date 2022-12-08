@@ -8,6 +8,19 @@ angular.module('eventcalender', [
             .when('/addEvent', {
                            template: '<add-event></add-event>'
                         })
-    .otherwise({ redirectTo: '/dashboard' });
+
+             .when('/dashboardEvent', {
+                                       template: '<dashboard-event></dashboard-event>'
+                                    })
+
+             .when('/updateEvent/:eventId', {
+                                        template: '<update-event></update-event>'
+                                   })
+
+              .when('/deleteEvent', {
+                                          template: '<delete-event></delete-event>'
+                                     })
+
+    .otherwise({ redirectTo: '/dashboardEvent' });
      }
     ])

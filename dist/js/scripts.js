@@ -45287,10 +45287,157 @@ angular.module('eventcalender', [
             .when('/addEvent', {
                            template: '<add-event></add-event>'
                         })
-    .otherwise({ redirectTo: '/dashboard' });
+
+             .when('/dashboardEvent', {
+                                       template: '<dashboard-event></dashboard-event>'
+                                    })
+
+             .when('/updateEvent/:eventId', {
+                                        template: '<update-event></update-event>'
+                                   })
+
+              .when('/deleteEvent', {
+                                          template: '<delete-event></delete-event>'
+                                     })
+
+    .otherwise({ redirectTo: '/dashboardEvent' });
      }
     ])
 
+//let nav = 0;
+//let clicked = null;
+//let events = localStorage.getItem('events') ? JSON.parse(localStorage.getItem('events')) : [];
+//
+//const calendar = document.getElementById('calendar');
+//const newEventModal = document.getElementById('newEventModal');
+//const deleteEventModal = document.getElementById('deleteEventModal');
+//const backDrop = document.getElementById('modalBackDrop');
+//const eventTitleInput = document.getElementById('eventTitleInput');
+//const weekdays = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
+//
+//function openModal(date) {
+//  clicked = date;
+//
+//  const eventForDay = events.find(e => e.date === clicked);
+//
+//  if (eventForDay) {
+//    document.getElementById('eventText').innerText = eventForDay.title;
+//    deleteEventModal.style.display = 'block';
+//  } else {
+//    newEventModal.style.display = 'block';
+//  }
+//
+//  backDrop.style.display = 'block';
+//}
+//
+//function load() {
+//  const dt = new Date();
+//
+//  if (nav !== 0) {
+//    dt.setMonth(new Date().getMonth() + nav);
+//  }
+//
+//  const day = dt.getDate();
+//  const month = dt.getMonth();
+//  const year = dt.getFullYear();
+//
+//  const firstDayOfMonth = new Date(year, month, 1);
+//  const daysInMonth = new Date(year, month + 1, 0).getDate();
+//
+//  const dateString = firstDayOfMonth.toLocaleDateString('en-us', {
+//    weekday: 'long',
+//    year: 'numeric',
+//    month: 'numeric',
+//    day: 'numeric',
+//  });
+//  const paddingDays = weekdays.indexOf(dateString.split(', ')[0]);
+//
+//  document.getElementById('monthDisplay').innerText =
+//    `${dt.toLocaleDateString('en-us', { month: 'long' })} ${year}`;
+//
+//  calendar.innerHTML = '';
+//
+//  for(let i = 1; i <= paddingDays + daysInMonth; i++) {
+//    const daySquare = document.createElement('div');
+//    daySquare.classList.add('day');
+//
+//    const dayString = `${month + 1}/${i - paddingDays}/${year}`;
+//
+//    if (i > paddingDays) {
+//      daySquare.innerText = i - paddingDays;
+//      const eventForDay = events.find(e => e.date === dayString);
+//
+//      if (i - paddingDays === day && nav === 0) {
+//        daySquare.id = 'currentDay';
+//      }
+//
+//      if (eventForDay) {
+//        const eventDiv = document.createElement('div');
+//        eventDiv.classList.add('event');
+//        eventDiv.innerText = eventForDay.title;
+//        daySquare.appendChild(eventDiv);
+//      }
+//
+//      daySquare.addEventListener('click', () => openModal(dayString));
+//    } else {
+//      daySquare.classList.add('padding');
+//    }
+//
+//    calendar.appendChild(daySquare);
+//  }
+//}
+//
+//function closeModal() {
+//  eventTitleInput.classList.remove('error');
+//  newEventModal.style.display = 'none';
+//  deleteEventModal.style.display = 'none';
+//  backDrop.style.display = 'none';
+//  eventTitleInput.value = '';
+//  clicked = null;
+//  load();
+//}
+//
+//function saveEvent() {
+//  if (eventTitleInput.value) {
+//    eventTitleInput.classList.remove('error');
+//
+//    events.push({
+//      date: clicked,
+//      title: eventTitleInput.value,
+//    });
+//
+//    localStorage.setItem('events', JSON.stringify(events));
+//    closeModal();
+//  } else {
+//    eventTitleInput.classList.add('error');
+//  }
+//}
+//
+//function deleteEvent() {
+//  events = events.filter(e => e.date !== clicked);
+//  localStorage.setItem('events', JSON.stringify(events));
+//  closeModal();
+//}
+//
+//function initButtons() {
+//  document.getElementById('nextButton').addEventListener('click', () => {
+//    nav++;
+//    load();
+//  });
+//
+//  document.getElementById('backButton').addEventListener('click', () => {
+//    nav--;
+//    load();
+//  });
+//
+//  document.getElementById('saveButton').addEventListener('click', saveEvent);
+//  document.getElementById('cancelButton').addEventListener('click', closeModal);
+//  document.getElementById('deleteButton').addEventListener('click', deleteEvent);
+//  document.getElementById('closeButton').addEventListener('click', closeModal);
+//}
+//
+//initButtons();
+//load();
 function addEventCtrl($http, $timeout,$location) {
   ctrl = this;
 ctrl.eventDetails = {
@@ -45300,7 +45447,132 @@ ctrl.eventDetails = {
 };
 ctrl.$onInit = function () {
     console.log("inside on addEvent init");
+    localStorage.clear();
+    getAllEvent();
+//    deleteEvent(eventId);
   };
+
+    ctrl.reDirectToDashboardEvent = function () {
+      $location.path('/dashboardEvent');
+    };
+
+function getAllEvent() {
+          console.log(".....inside get all event..........");
+          $http({
+            method: "GET",
+          url: "http://localhost:8080/UserMyBatis/listOfEvent",
+          }).then(
+            function successCallback(response) {
+              console.log("response from backend---------->", response.data);
+              ctrl.eventList = response.data;
+              console.log(ctrl.eventList);
+              localStorage.setItem('events', JSON.stringify(ctrl.eventList));
+              console.log(localStorage.getItem('events'));
+              events = localStorage.getItem('events') ? JSON.parse(localStorage.getItem('events')) : [];
+              //generate calender
+//              initButtons();
+//              load();
+            },
+            function errorCallback(response) {
+              console.log(response.statusText); //http status code response
+            }
+          );
+    }
+
+
+ // calls the REST API to delete user details
+  ctrl.deleteEvent = function (eventId) {
+    console.log("Delete Event", eventId);
+    $http({
+      method: "DELETE",
+      url: "http://localhost:8080/UserMyBatis/deleteEvent/" +eventId
+    }).then(
+      function successCallback(response) {
+        if (ctrl.eventList != null && ctrl.eventList.length > 0) {
+            // iterate over eventList
+             ctrl.eventList.forEach((calenderInfo, index) => {
+             // remove the entry from eventlist which is deleted from table
+             if (calenderInfo.event_id === eventId) {
+                    ctrl.eventList.splice(index, 1);
+             }
+             });
+        }
+
+
+        $timeout(function () {
+          ctrl.successUserAddedMessagebool = false;
+        }, 5000);
+        console.log("response from backend---------->", response);
+      },
+    );
+  };
+
+
+    function updateEvent() {
+          console.log(".....inside update Event..........");
+          $http({
+            method: "POST",
+          url: "http://localhost:8080/UserMyBatis/updateevent",
+          }).then(
+            function successCallback(response) {
+              console.log("response from backend---------->", response);
+              ctrl.eventList = response.data;
+            },
+            function errorCallback(response) {
+              console.log(response.statusText); //http status code response
+            }
+          );
+        };
+
+
+
+
+
+ // calls the REST API to update user details
+//    ctrl.updateEvent = function () {
+//      console.log("inside updateEventDetails", ctrl.eventDetails);
+//      $http({
+//        method: "POST",
+//        url: "http://localhost:8080/UserMyBatis/updateEvent",
+//        data: ctrl.eventDetails,
+//      }).then(
+//        function successCallback(response) {
+//          ctrl.successUserAddedMessage = "Event updated successfully";
+//          ctrl.successUserAddedMessagebool = true;
+//          $timeout(function () {
+//            ctrl.successUserAddedMessagebool = false;
+//          }, 5000);
+//          console.log("response from backend---------->", response);
+//        },
+//        function errorCallback(response) {
+//          console.log(response.statusText); //http status code response
+//          ctrl.failedUserAddedMessage = "User does not added successfully";
+//          ctrl.failedUserAddedMessagebool = true;
+//          $timeout(function () {
+//            ctrl.failedUserAddedMessagebool = false;
+//          }, 5000);
+//        }
+//      );
+//    };
+
+
+
+  ctrl.redirectToAddEventPage = function() {
+     $location.path('/addEvent');
+  };
+
+ ctrl.redirectToDashboard = function() {
+     $location.path('/dashboardEvent');
+  };
+
+  ctrl.redirectToEditEventPage = function(eventDetails) {
+     console.log(".....inside redirectToEditEventPage .........."+ eventDetails.title);
+     $location.path('/updateEvent/' + eventDetails.event_id);
+  };
+
+
+
+
 
   // calls the REST API to save user details
     ctrl.addEvent = function () {
@@ -45315,7 +45587,7 @@ $http({
             ctrl.successUserAddedMessagebool = true;
             $timeout(function () {
                       ctrl.successUserAddedMessagebool = false;
-                      $location.path('/dashboardUser');
+                      $location.path('/dashboard');
                     }, 1000);
                     console.log("response from backend---------->", response);
                   },
@@ -45325,11 +45597,17 @@ $http({
                           ctrl.failedUserAddedMessagebool = true;
                           $timeout(function () {
                             ctrl.failedUserAddedMessagebool = false;
+//                            $location.path('/addEvent');
+
                           }, 2000);
                   }
           );
     };
-   }
+
+ }
+
+
+
 
 angular.module("eventcalender").component("addEvent", {
   templateUrl: "views/add-event.html",
@@ -45337,6 +45615,207 @@ angular.module("eventcalender").component("addEvent", {
   controllerAs: "ctrl"
 });
 
+    function dashboardEventCtrl($http,$location) {
+     let nav = 0;
+     let clicked = null;
+     let events = [];
+
+     const calendar = document.getElementById('calendar');
+     const newEventModal = document.getElementById('newEventModal');
+     const deleteEventModal = document.getElementById('deleteEventModal');
+     const backDrop = document.getElementById('modalBackDrop');
+     const eventTitleInput = document.getElementById('eventTitleInput');
+     const weekdays = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
+
+     ctrl = this;
+     ctrl.eventList = [];
+     ctrl.eventDetails = {
+          date: "",
+          title: "",
+          link: ""
+     };
+
+  ctrl.$onInit = function () {
+      console.log("inside on dashboard Event init");
+      localStorage.clear();
+      getAllEvent();
+  };
+
+  load = function () {
+      const dt = new Date();
+
+      if (nav !== 0) {
+        dt.setMonth(new Date().getMonth() + nav);
+      }
+
+      const day = dt.getDate();
+      const month = dt.getMonth();
+      const year = dt.getFullYear();
+
+      const firstDayOfMonth = new Date(year, month, 1);
+      const daysInMonth = new Date(year, month + 1, 0).getDate();
+
+      const dateString = firstDayOfMonth.toLocaleDateString('en-us', {
+        weekday: 'long',
+        year: 'numeric',
+        month: 'numeric',
+        day: 'numeric',
+      });
+      const paddingDays = weekdays.indexOf(dateString.split(', ')[0]);
+
+      document.getElementById('monthDisplay').innerText =
+        `${dt.toLocaleDateString('en-us', { month: 'long' })} ${year}`;
+
+      calendar.innerHTML = '';
+
+      for(let i = 1; i <= paddingDays + daysInMonth; i++) {
+        const daySquare = document.createElement('div');
+        daySquare.classList.add('day');
+
+        const dayString = `${month + 1}/${i - paddingDays}/${year}`;
+
+        if (i > paddingDays) {
+          daySquare.innerText = i - paddingDays;
+          const eventForDay = events.find(e => e.date === dayString);
+
+          if (i - paddingDays === day && nav === 0) {
+            daySquare.id = 'currentDay';
+          }
+          // to attach event
+          if (eventForDay) {
+            const eventInfoDiv = document.createElement('div');
+            const eventDiv = document.createElement('div');
+            const linkDiv = document.createElement('div');
+            eventInfoDiv.classList.add('event');
+            eventDiv.innerText = eventForDay.title;
+            linkDiv.innerText = eventForDay.link;
+            //linkDiv.title = eventForDay.link;
+            eventInfoDiv.appendChild(eventDiv);
+            eventInfoDiv.appendChild(linkDiv);
+            daySquare.appendChild(eventInfoDiv);
+          }
+
+          daySquare.addEventListener('click', () => openModal(dayString));
+        } else {
+          daySquare.classList.add('padding');
+        }
+
+        calendar.appendChild(daySquare);
+      }
+    }
+
+
+ closeModal = function() {
+   eventTitleInput.classList.remove('error');
+   newEventModal.style.display = 'none';
+   deleteEventModal.style.display = 'none';
+   backDrop.style.display = 'none';
+   eventTitleInput.value = '';
+   clicked = null;
+   load();
+ }
+
+ initButtons = function () {
+   document.getElementById('nextButton').addEventListener('click', () => {
+     nav++;
+     load();
+   });
+
+   document.getElementById('backButton').addEventListener('click', () => {
+     nav--;
+     load();
+   });
+
+//   document.getElementById('saveButton').addEventListener('click', saveEvent);
+//   document.getElementById('cancelButton').addEventListener('click', closeModal);
+//   document.getElementById('deleteButton').addEventListener('click', deleteEvent);
+//   document.getElementById('closeButton').addEventListener('click', closeModal);
+ }
+
+ ctrl.redirectToAddEventPage = function() {
+     $location.path('/addEvent');
+  };
+
+    function getAllEvent() {
+          console.log(".....inside get all event..........");
+          $http({
+            method: "GET",
+          url: "http://localhost:8080/UserMyBatis/listOfEvent",
+          }).then(
+            function successCallback(response) {
+              console.log("response from backend---------->", response.data);
+              ctrl.eventList = response.data;
+              console.log(ctrl.eventList);
+              localStorage.setItem('events', JSON.stringify(ctrl.eventList));
+              console.log(localStorage.getItem('events'));
+              events = localStorage.getItem('events') ? JSON.parse(localStorage.getItem('events')) : [];
+
+              events.forEach((event) => {
+                  let dayString= event.date.split("-");
+                   event.date= dayString[1]+"/"+dayString[2]+"/"+dayString[0];
+              });
+               console.log(events);
+              //generate calender
+              initButtons();
+              load();
+            },
+            function errorCallback(response) {
+              console.log(response.statusText); //http status code response
+            }
+          );
+    }
+  }
+
+
+
+angular.module("eventcalender").component("dashboardEvent", {
+      templateUrl: "views/dashboard-event.html",
+      controller: dashboardEventCtrl,
+      controllerAs: "ctrl"
+    });
+
+function deleteEventCtrl($http, $timeout,$location){
+ctrl = this;
+ctrl.eventDetails = {
+        date: "",
+        title: "",
+        link: ""
+};
+ ctrl.$onInit = function () {
+    console.log("inside on deleteEvent init");
+  };
+
+  // calls the REST API to delete user details
+    ctrl.deleteEvent = function (eventId) {
+      console.log("Delete Event", eventId);
+      $http({
+        method: "DELETE",
+        url: "http://localhost:8080/UserMyBatis/deleteEvent/" +eventId
+      }).then(
+        function successCallback(response) {
+          if (ctrl.eventList != null && ctrl.eventList.length > 0) {
+              // iterate over eventList
+               ctrl.eventList.forEach((calenderInfo, index) => {
+               // remove the entry from eventList which is deleted from table
+               if (calenderInfo.eventId === eventId) {
+                      ctrl.eventList.splice(index, 1);
+               }
+               });
+          }
+          $timeout(function () {
+            ctrl.successUserAddedMessagebool = false;
+          }, 5000);
+          console.log("response from backend---------->", response);
+        }
+      );
+    };
+}
+
+angular.module("eventcalender").component("deleteEvent", {
+templateUrl: "views/delete-event.html",
+controller: deleteEventCtrl,
+controllerAs: "ctrl"
+});
 function homeCtrl($location){
     ctrl = this;
     ctrl.$onInit =function(){
@@ -45350,4 +45829,68 @@ angular.module("eventcalender").component("home", {
     templateUrl: 'views/dashboard.html',
     controller: homeCtrl,
     controllerAs: 'ctrl'
+});
+function updateEventCtrl($http, $timeout,$location,$routeParams){
+ctrl = this;
+ctrl.eventId;
+ctrl.eventDetails = {
+        event_id:0,
+        date: "",
+        title: "",
+        link: ""
+};
+ ctrl.$onInit = function () {
+    console.log("inside on editEvent init");
+    console.log($routeParams.eventId);
+    let events = localStorage.getItem('events') ? JSON.parse(localStorage.getItem('events')) : [];
+    console.log(events);
+    let eventForDay = events.find(e => e.event_id == $routeParams.eventId);
+    console.log("event"+eventForDay);
+    ctrl.eventDetails = eventForDay;
+
+  };
+
+  ctrl.redirectToAddEventPage = function() {
+       $location.path('/addEvent');
+    };
+
+     ctrl.reDirectToDashboardEvent = function () {
+          $location.path('/dashboardEvent');
+        };
+
+  // calls the REST API to update user details
+      ctrl.updateEvents = function () {
+        console.log("inside updateEventDetails:", ctrl.eventDetails);
+        $http({
+          method: "PUT",
+          url: "http://localhost:8080/UserMyBatis/editEvent",
+          data: ctrl.eventDetails,
+        }).then(
+          function successCallback(response) {
+            ctrl.successUserAddedMessage = "Event updated successfully";
+            ctrl.successUserAddedMessagebool = true;
+            $location.path('/addEvent');
+            $timeout(function () {
+              ctrl.successUserAddedMessagebool = false;
+            }, 5000);
+            console.log("response from backend---------->", response);
+          },
+          function errorCallback(response) {
+            console.log(response.statusText); //http status code response
+            ctrl.failedUserAddedMessage = "Event does not updated successfully";
+            ctrl.failedUserAddedMessagebool = true;
+            $timeout(function () {
+              ctrl.failedUserAddedMessagebool = false;
+            }, 5000);
+          }
+        );
+      };
+ }
+
+
+
+angular.module("eventcalender").component("updateEvent", {
+templateUrl: "views/update-event.html",
+controller: updateEventCtrl,
+controllerAs: "ctrl"
 });

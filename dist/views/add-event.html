@@ -1,3 +1,7 @@
+
+<link rel="stylesheet"
+      href="https://maxcdn.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css">
+<div>
 <div class="cart-card">
     <div class="info">
         <span class="title2">Add Event Information</span>
@@ -25,7 +29,8 @@
         </div>
 
         <button class="continue" ng-click="ctrl.addEvent()"> Add </button>
-        <button class="continue" ng-click="ctrl.reDirectToDashboard()"> Back </button>
+        <button class="continue" style="text-align:center" ng-click="ctrl.reDirectToDashboardEvent()"> Go to Calender </button>
+<!--        <button class="continue1" ng-click="ctrl.redirectToDashboard()"> Back </button>-->
         <div class="message2" ng-show="ctrl.successUserAddedMessagebool">
             <strong>{{ ctrl.successUserAddedMessage }}</strong>
         </div>
@@ -33,5 +38,42 @@
             <strong>{{ ctrl.failedUserAddedMessage }}</strong>
         </div>
     </div>
+</div>
 
+<div class="container">
+    <span class="title2">Event Details</span>
+    <hr />
+    <table border="1" class="table table-striped table-bordered">
+        <thead class="thead-dark">
+        <tr>
+            <th>Date</th>
+            <th>Title </th>
+            <th>Link</th>
+            <th> Update </th>
+            <th> Delete </th>
+
+        </tr>
+        </thead>
+        <tbody>
+        <tr ng-repeat="eventDetails in ctrl.eventList">
+            <td>{{eventDetails.date}}</td>
+            <td>{{eventDetails.title}}</td>
+            <td>{{eventDetails.link}}</td>
+
+            <td><button class="add-to-cart-button" ng-click="ctrl.redirectToEditEventPage(eventDetails)">
+                Update </button> </td>
+            <td> <button class="add-to-cart-button" ng-click="ctrl.deleteEvent(eventDetails.event_id)">
+                    Delete
+                </button></td>
+<!--                <button class="add-to-cart-button" ng-click="ctrl.redirectToAddEventPage(event.eventId)">-->
+<!--                    Delete-->
+<!--                </button>-->
+        </tr>
+        </tbody>
+    </table>
+<!--    <p align="right">-->
+<!--        <button class="continue" ng-click="ctrl.redirectToAddEventPage()" > Add New Event </button>-->
+<!--    </p>-->
+
+</div>
 </div>
